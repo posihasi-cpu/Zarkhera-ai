@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ur">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zarkhera AI</title><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#176b35">
+<style>
+body{font-family:Arial;margin:0;background:#f3f8f3;color:#17351e}header{background:#176b35;color:#fff;padding:24px;border-radius:0 0 22px 22px}main{max-width:600px;margin:auto;padding:18px}.card{background:#fff;padding:18px;margin:14px 0;border-radius:18px;box-shadow:0 4px 15px #0001}select,input,button{width:100%;padding:13px;margin-top:8px;border-radius:11px;border:1px solid #ccd8ce;font-size:16px}button{background:#176b35;color:#fff;border:0;font-weight:bold}.result{display:none;line-height:1.65}.label{font-weight:bold}img{max-width:100%;border-radius:12px;margin-top:10px}
+</style></head>
+<body><header><h1>🌱 Zarkhera AI</h1><div id="sub">Pakistan Crop Health Assistant</div></header>
+<main>
+<div class="card"><label>Language / زبان / ٻولي</label><select id="lang"><option value="en">English</option><option value="ur">اردو</option><option value="sd">سنڌي</option></select></div>
+<div class="card"><label>Crop / فصل / فصل</label><select id="crop"><option value="auto">Auto detect</option><option value="onion">Onion / پیاز / بصر</option><option value="wheat">Wheat / گندم / ڪڻڪ</option><option value="cotton">Cotton / کپاس / ڪپهه</option><option value="rice">Rice / چاول / چانور</option><option value="maize">Maize / مکئی / مڪائي</option><option value="tomato">Tomato / ٹماٹر / ٽماٽو</option><option value="chilli">Chilli / مرچ / مرچ</option><option value="potato">Potato / آلو / آلو</option><option value="okra">Okra / بھنڈی / ڀينڊي</option><option value="brinjal">Brinjal / بینگن / واڱڻ</option><option value="sugarcane">Sugarcane / گنا / ڪمند</option></select></div>
+<div class="card"><label>📸 Upload crop photo</label><input id="photo" type="file" accept="image/*"><img id="preview" style="display:none"><button id="go">🔎 Analyze with AI</button></div>
+<div class="card result" id="result"><h2 id="diag">—</h2><p><span class="label">Crop:</span> <span id="rCrop"></span></p><p><span class="label">Category:</span> <span id="cat"></span></p><p><span class="label">Confidence:</span> <span id="conf"></span>%</p><p><span class="label">Symptoms:</span> <span id="sym"></span></p><p><span class="label">Severity:</span> <span id="sev"></span></p><p><span class="label">Management:</span> <span id="man"></span></p><p><span class="label">Prevention:</span> <span id="prev"></span></p><p id="expert"></p></div>
+<div style="text-align:center;margin:24px 0 8px;color:#5f7063;font-size:14px;">Made by <b>Hasnain</b> 🌱</div></main>
+<script>
+const $=id=>document.getElementById(id);
+$("photo").onchange=()=>{let f=$("photo").files[0];if(f){$("preview").src=URL.createObjectURL(f);$("preview").style.display="block"}};
+$("go").onclick=async()=>{
+ let f=$("photo").files[0]; if(!f){alert("Please upload a crop photo.");return}
+ $("go").disabled=true;$("go").textContent="Analyzing…";
+ let fd=new FormData();fd.append("photo",f);fd.append("crop",$("crop").value);fd.append("lang",$("lang").value);
+ try{let r=await fetch("/api/analyze",{method:"POST",body:fd});let x=await r.json();if(!r.ok)throw Error(x.error);
+ $("diag").textContent=x.diagnosis||"—";$("rCrop").textContent=x.crop||"—";$("cat").textContent=x.category||"—";$("conf").textContent=x.confidence_percent??"—";$("sym").textContent=x.symptoms||"—";$("sev").textContent=x.severity||"—";$("man").textContent=x.management||"—";$("prev").textContent=x.prevention||"—";$("expert").textContent=x.needs_expert_check?"⚠️ Expert/local agriculture check recommended.":"";$("result").style.display="block"
+ }catch(e){alert(e.message)}finally{$("go").disabled=false;$("go").textContent="🔎 Analyze with AI"}};
+</script><script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js")}</script></body></html>
